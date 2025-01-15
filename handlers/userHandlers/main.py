@@ -114,7 +114,7 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
         await call.message.delete()
     except:
         pass
-    await call.message.answer_photo(caption=send_text, photo=send_img)
+    await call.message.answer_photo(caption=send_text, photo=send_img, reply_markup=main_menu_kb)
     await state.set_state(UserStates.MAIN_MENU)
 
     
@@ -158,7 +158,7 @@ async def input_contact_data(message : Message, state : FSMContext):
 ✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
 
 Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
-    await message.answer_photo(caption=send_text, photo=send_img)
+    await message.answer_photo(caption=send_text, photo=send_img, reply_markup=main_menu_kb)
     await state.set_state(UserStates.MAIN_MENU)
 
 
@@ -233,7 +233,7 @@ async def input_contact_data_order(message : Message, state : FSMContext):
 ✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
 
 Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
-    await message.answer_photo(caption=send_text, photo=send_img)
+    await message.answer_photo(caption=send_text, photo=send_img, reply_markup=main_menu_kb)
     await state.set_state(UserStates.MAIN_MENU)
 
 
