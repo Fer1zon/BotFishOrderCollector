@@ -101,6 +101,7 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
 
     await call.answer(send_text)
     
+    send_img = "AgACAgIAAxkBAAMFZ4ecaQr-Qmqsje92WsZtGpUTi50AAoHmMRtCeUBIck1Flyji1Y4BAAMCAANzAAM2BA"
     send_text = """Добрый день, соседи! 🌞
 
 Мы — магазин "Рыба в сети" — запускаем доставку охлаждённой красной рыбы! 🚚🐟 В рамках тестирования сервиса вы можете получить бесплатный пробник филе лосося (250–300 г).
@@ -108,19 +109,13 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
 ✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
 
 Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
-    try:
-        await call.message.edit_text(text = send_text, reply_markup=main_menu_kb)
-        await state.set_state(UserStates.MAIN_MENU)
-    
 
-    except TelegramBadRequest:
-        await call.message.answer(text = send_text, reply_markup=main_menu_kb)
-        await state.set_state(UserStates.MAIN_MENU)
-    
-    
-    except Exception as ex:
-        logger.error(f"Error in choice_time_delivery handler: {str(ex)}")
-        await call.answer(text = "Произошла ошибка, попробуйте позже.")
+    try:
+        await call.message.delete()
+    except:
+        pass
+    await call.message.answer_photo(caption=send_text, photo=send_img)
+    await state.set_state(UserStates.MAIN_MENU)
 
     
         
@@ -155,6 +150,7 @@ async def input_contact_data(message : Message, state : FSMContext):
 
     await message.answer(send_text)
 
+    send_img = "AgACAgIAAxkBAAMFZ4ecaQr-Qmqsje92WsZtGpUTi50AAoHmMRtCeUBIck1Flyji1Y4BAAMCAANzAAM2BA"
     send_text = """Добрый день, соседи! 🌞
 
 Мы — магазин "Рыба в сети" — запускаем доставку охлаждённой красной рыбы! 🚚🐟 В рамках тестирования сервиса вы можете получить бесплатный пробник филе лосося (250–300 г).
@@ -162,7 +158,7 @@ async def input_contact_data(message : Message, state : FSMContext):
 ✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
 
 Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
-    await message.answer(send_text, reply_markup=main_menu_kb)
+    await message.answer_photo(caption=send_text, photo=send_img)
     await state.set_state(UserStates.MAIN_MENU)
 
 
@@ -229,6 +225,7 @@ async def input_contact_data_order(message : Message, state : FSMContext):
     
     send_text = "Спасибо ваша заявка принята."
     await message.answer(send_text)
+    send_img = "AgACAgIAAxkBAAMFZ4ecaQr-Qmqsje92WsZtGpUTi50AAoHmMRtCeUBIck1Flyji1Y4BAAMCAANzAAM2BA"
     send_text = """Добрый день, соседи! 🌞
 
 Мы — магазин "Рыба в сети" — запускаем доставку охлаждённой красной рыбы! 🚚🐟 В рамках тестирования сервиса вы можете получить бесплатный пробник филе лосося (250–300 г).
@@ -236,7 +233,7 @@ async def input_contact_data_order(message : Message, state : FSMContext):
 ✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
 
 Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
-    await message.answer(send_text, reply_markup=main_menu_kb)
+    await message.answer_photo(caption=send_text, photo=send_img)
     await state.set_state(UserStates.MAIN_MENU)
 
 
