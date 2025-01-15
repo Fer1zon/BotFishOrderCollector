@@ -31,16 +31,18 @@ async def get_sample(call : CallbackQuery, state : FSMContext):
 
     try:
         await call.message.edit_text(text = send_text, reply_markup=choice_rc_kb)
+        await state.set_state(UserStates.CHOICE_RESIDENTIAL_COMPLEX)
 
     except TelegramBadRequest:
         await call.message.answer(text = send_text, reply_markup=choice_rc_kb)
+        await state.set_state(UserStates.CHOICE_RESIDENTIAL_COMPLEX)
     
     except Exception as ex:
         logger.error(f"Error in get_sample handler: {str(ex)}")
         await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
-    else:
-        await state.set_state(UserStates.CHOICE_RESIDENTIAL_COMPLEX)
+    
+        
 
 @router.callback_query(F.data.in_({"НОВЫЙ ЛЕССНЕР", "FAMILIA", "АРИОСТО", "ГРАНД ВЬЮ"}), UserStates.CHOICE_RESIDENTIAL_COMPLEX)
 async def choice_residential_complex(call : CallbackQuery, state : FSMContext):
@@ -51,24 +53,23 @@ async def choice_residential_complex(call : CallbackQuery, state : FSMContext):
 
     try:
         await call.message.edit_text(text = send_text, reply_markup=keyboard)
+        await state.set_state(UserStates.CHOICE_TIME_DELIVERY)
 
     except TelegramBadRequest:
         await call.message.answer(text = send_text, reply_markup=keyboard)
+        await state.set_state(UserStates.CHOICE_TIME_DELIVERY)
     
     except Exception as ex:
         logger.error(f"Error in choice_residential_complex handler: {str(ex)}")
         await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
-    else:
-        await state.set_state(UserStates.CHOICE_TIME_DELIVERY)
+    
+        
 
 @router.callback_query(F.data.not_in({"in_menu"}), UserStates.CHOICE_TIME_DELIVERY)
 async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
 
-    try:
-        datetime.strptime(call.data, "%Y-%m-%d %H:%M:%S")
-    except ValueError:
-        return await call.answer(text = "Неверный формат даты и времени")
+    
     
     
     
@@ -81,16 +82,18 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
 
         try:
             await call.message.edit_text(text = send_text)
+            await state.set_state(UserStates.INPUT_CONTACT_DATA)
 
         except TelegramBadRequest:
             await call.message.answer(text = send_text)
+            await state.set_state(UserStates.INPUT_CONTACT_DATA)
         
         except Exception as ex:
             logger.error(f"Error in choice_time_delivery handler: {str(ex)}")
             await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
-        else:
-            await state.set_state(UserStates.INPUT_CONTACT_DATA)
+        
+            
 
         return
     
@@ -115,24 +118,27 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
 Если вам понравится наша рыба или вы уже получали пробник и хотите сделать предзаказ на свежую рыбу, нажимайте на кнопку "Оставить предзаказ". 🛒✨"""
     try:
         await call.message.edit_text(text = send_text, reply_markup=main_menu_kb)
+        await state.set_state(UserStates.MAIN_MENU)
+    
 
     except TelegramBadRequest:
         await call.message.answer(text = send_text, reply_markup=main_menu_kb)
+        await state.set_state(UserStates.MAIN_MENU)
+    
     
     except Exception as ex:
         logger.error(f"Error in choice_time_delivery handler: {str(ex)}")
         await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
-    else:
-        await state.set_state(UserStates.MAIN_MENU)
     
+        
     data = await state.get_data()
 
     send_text = f"""
 <b>Пробник</b>
 <b>Пользователь:</b> @{call.from_user.username}
 <b>ЖК:</b> <i>{data["rc"]}</i>
-<b>Дата получения:</b> <code>{datetime.strptime(call.data, "%d.%m.%Y")}</code>
+<b>Дата получения:</b> <code>{call.data}</code>
 
 <b>Контактные данные:</b>
 <i>{contact_data}</i>"""
@@ -180,7 +186,7 @@ async def input_contact_data(message : Message, state : FSMContext):
 <b>Пробник</b>
 <b>Пользователь:</b> @{message.from_user.username}
 <b>ЖК:</b> <i>{data["rc"]}</i>
-<b>Дата получения:</b> <code>{datetime.strptime(data["sample_datetime"], "%d.%m.%Y")}</code>
+<b>Дата получения:</b> <code>{data["sample_datetime"]}</code>
 
 <b>Контактные данные:</b>
 <i>{contact_data}</i>"""
@@ -203,16 +209,17 @@ async def make_order(call : CallbackQuery, state : FSMContext):
 Эта информация нужна, чтобы мы могли уточнить детали доставки.😊"""
         try:
             await call.message.edit_text(text = send_text)
+            await state.set_state(UserStates.INPUT_CONTACT_DATA_ORDER)
 
         except TelegramBadRequest:
             await call.message.answer(text = send_text)
+            await state.set_state(UserStates.INPUT_CONTACT_DATA_ORDER)
         
         except Exception as ex:
             logger.error(f"Error in make_order handler: {str(ex)}")
             await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
-        else:
-            await state.set_state(UserStates.INPUT_CONTACT_DATA_ORDER)
+        
 
         return
     

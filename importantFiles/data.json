@@ -1,20 +1,5 @@
 {
     "users": {
-        "1741261245": {
-            "contact_data": "\u0442\u0435\u0441\u0442",
-            "get_sample": true
-        },
-        "5530562487": {
-            "contact_data": null,
-            "get_sample": false
-        },
-        "5617611784": {
-            "contact_data": "\u0422\u0435\u0441\u0442\u043e\u0432\u0438\u0447 +79990000000",
-            "get_sample": true
-        },
-        "257138851": {
-            "contact_data": null,
-            "get_sample": false
-        }
+        
     }
 }

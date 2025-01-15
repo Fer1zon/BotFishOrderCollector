@@ -56,8 +56,8 @@ def get_datetime_order_kb(current_time : datetime = None) -> InlineKeyboardMarku
         required_date_friday = datetime.combine(required_date_friday, time(hour=20, minute=0))
 
     
-    button1 = InlineKeyboardButton(text = required_date_thursday.strftime("%d.%m %H:%M"), callback_data=str(required_date_thursday))
-    button2 = InlineKeyboardButton(text = required_date_friday.strftime("%d.%m %H:%M"), callback_data=str(required_date_friday))
+    button1 = InlineKeyboardButton(text = required_date_thursday.strftime("%d.%m %H:%M"), callback_data=str(required_date_thursday.strftime("%d.%m.%Y")))
+    button2 = InlineKeyboardButton(text = required_date_friday.strftime("%d.%m %H:%M"), callback_data=str(required_date_friday.strftime("%d.%m.%Y")))
     keyboard = InlineKeyboardBuilder().add(button1, button2).adjust(1).as_markup()
 
     return keyboard
