@@ -8,7 +8,11 @@ from importantFiles.FSM import UserStates, AdminStates
 
 from filters.adminFilters import IsAdmin
 
-from utils.database.user import add_user
+
+from utils.data_working import add_user_to_database
+from handlers.keyboard import main_menu_kb
+
+
 
 
 
@@ -19,19 +23,23 @@ router = Router()
 
 
 
-
-@router.message(CommandStart(), IsAdmin())
-async def start_admin(message : Message, state : FSMContext):
-    send_text = "Привет, Администратор!"
-    await message.answer(send_text)
-    
-    await state.set_state(AdminStates.MAIN_MENU)
-
+# @router.message(F.photo)
+# async def photo_(message : Message):
+#     print(message.photo[0].file_id)
 
 @router.message(CommandStart())
 async def start_user(message : Message, state : FSMContext):
-    send_text = "Привет, Пользователь!"
-    await message.answer(send_text)
+    add_user_to_database(message.from_user.id)
+
+    send_img = "AgACAgIAAxkBAAONZ4eRrXJ-DIzh87I0WESMJjFvuZwAAoHmMRtCeUBI5FQw4h_uJLYBAAMCAANzAAM2BA"
+    send_text = """Добрый день, соседи! 🌞
+
+Мы — магазин "Рыба в сети" — запускаем доставку охлаждённой красной рыбы! 🚚🐟 В рамках тестирования сервиса вы можете получить бесплатный пробник филе лосося (250–300 г).
+
+✔ Это премиальное мурманское филе, не подвергавшееся заморозке, свежее и высокого качества.
+
+Чтобы попробовать, жмите "Получить пробник". Если уже получали пробник и хотите сделать предзаказ рыбы, нажимайте "Оставить предзаказ". 🛒✨"""
+    await message.answer_photo(caption=send_text, photo=send_img, reply_markup=main_menu_kb)
 
     await state.set_state(UserStates.MAIN_MENU)
 

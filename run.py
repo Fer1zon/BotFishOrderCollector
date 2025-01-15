@@ -1,21 +1,18 @@
 import asyncio
-from importantFiles.config import createTables, dp, bot
-
-from scheduler.main import scheduler
+from importantFiles.config import dp, bot
 
 from handlers.start import router as startRouter
+from handlers.userHandlers.main import router as main_user_handler_router
 
 
 
 
 
 async def main():
-    await createTables()
 
-    scheduler.start()
 
     dp.include_router(startRouter)
-
+    dp.include_router(main_user_handler_router)
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
 
