@@ -46,8 +46,8 @@ async def start_user(message : Message, state : FSMContext):
 - Хвостовая часть 
 - Целая рыба 
 Оставляйте заявку, и наш менеджер свяжется с вами для согласования всех деталей доставки и заказа. 🛒✨"""
-    # await message.answer_video(caption=send_text, video=send_video, reply_markup=main_menu_kb)
-    await message.answer(send_text, reply_markup=main_menu_kb)
+    await message.answer_video(caption=send_text, video=send_video, reply_markup=main_menu_kb)
+    #await message.answer(send_text, reply_markup=main_menu_kb)
     
 
 
