@@ -204,7 +204,7 @@ async def make_order(call : CallbackQuery, state : FSMContext):
         return
     
     send_text = "Спасибо ваша заявка принята."
-    await call.answer(send_text)
+    await call.message.reply(send_text)
 
     send_text = f"""
 <b>Заказ</b>
