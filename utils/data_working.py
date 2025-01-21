@@ -2,7 +2,20 @@ import json
 from pathlib import Path
 
 
+from os.path import exists
 
+
+def create_json_file(path_to_json  = Path("importantFiles","data.json")) -> bool:#Return True if the file create, or False
+    if not exists(path_to_json):
+        with open(path_to_json, "w", encoding="utf-8") as write_file:
+            json.dump({
+    "users": {
+        
+            }
+                        }, write_file, indent=4)
+        return True
+    
+    return False
 
 
 def check_user_in_database(user_id : str, path_to_json  = Path("importantFiles","data.json")) -> bool:#True if user in database, false if not
