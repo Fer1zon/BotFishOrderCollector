@@ -164,3 +164,6 @@ cython_debug/
 
 importantFiles\data.json
 importantFiles/data.json
+
+importantFiles\database\data_base.db
+importantFiles/database/data_base.db

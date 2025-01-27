@@ -15,12 +15,40 @@ from datetime import datetime
 
 from importantFiles.config import SEND_ORDER_CHAT_ID, bot
 
-from utils.data_working import check_get_sample, edit_contact_data, change_get_sample, get_contact_data
-from utils.message_making import get_welcome_message
+from utils.json_data_working import check_get_sample, change_get_sample
+from utils.message_making import get_welcome_message, about_us as about_us_message, prices as prices_message
 
 
 router = Router()
 logger = logging.getLogger(__name__)
+
+
+@router.callback_query(F.data == "about us")
+async def about_us(call : CallbackQuery):
+    content = await about_us_message()
+
+    await call.message.answer(content["text"], reply_markup=content["keyboard"])
+
+@router.callback_query(F.data == "prices")
+async def prices(call : CallbackQuery):
+    content = await prices_message()
+
+    await call.message.answer(content["text"], reply_markup=content["keyboard"])
+
+
+@router.callback_query(F.data == "in menu")
+async def in_menu(call : CallbackQuery, state : FSMContext):
+    message_content = await get_welcome_message()
+    send_video = message_content["video"]
+    send_text = message_content["text"]
+    main_menu_kb = message_content["keyboard"]
+    
+    await call.message.answer_video(caption=send_text, video=send_video, reply_markup=main_menu_kb)
+    
+
+
+    await state.set_state(UserStates.MAIN_MENU)
+
 
 
 
@@ -74,69 +102,29 @@ async def choice_time_delivery(call : CallbackQuery, state : FSMContext):
     
     
     
-    contact_data = get_contact_data(call.from_user.id)
-    if not contact_data:
-        await state.update_data(sample_datetime = call.data)
+    
+    await state.update_data(sample_datetime = call.data)
 
-        send_text = """Пожалуйста, напишите ваше имя и номер телефона для связи: 
+    send_text = """Пожалуйста, напишите ваше имя и номер телефона для связи: 
 Эта информация нужна, чтобы мы могли уточнить детали доставки.😊"""
 
-        try:
-            await call.message.edit_text(text = send_text)
-            await state.set_state(UserStates.INPUT_CONTACT_DATA)
-
-        except TelegramBadRequest:
-            await call.message.answer(text = send_text)
-            await state.set_state(UserStates.INPUT_CONTACT_DATA)
-        
-        except Exception as ex:
-            logger.error(f"Error in choice_time_delivery handler: {str(ex)}")
-            await call.answer(text = "Произошла ошибка, попробуйте позже.")
-
-        
-            
-
-        return
-    
-    send_text = "Спасибо ваша заявка принята."
-
-    await call.answer(send_text)
-    
-    message_content = await get_welcome_message()
-    send_video = message_content["video"]
-    send_text = message_content["text"]
-    main_menu_kb = message_content["keyboard"]
-    
-    
-
-
-    
-
     try:
-        await call.message.delete()
-    except:
-        pass
-    await call.message.answer_video(caption=send_text, video=send_video, reply_markup=main_menu_kb)
-    #await message.answer(send_text, reply_markup=main_menu_kb)
-    await state.set_state(UserStates.MAIN_MENU)
+        await call.message.edit_text(text = send_text)
+        await state.set_state(UserStates.INPUT_CONTACT_DATA)
+
+    except TelegramBadRequest:
+        await call.message.answer(text = send_text)
+        await state.set_state(UserStates.INPUT_CONTACT_DATA)
+    
+    except Exception as ex:
+        logger.error(f"Error in choice_time_delivery handler: {str(ex)}")
+        await call.answer(text = "Произошла ошибка, попробуйте позже.")
 
     
         
-    data = await state.get_data()
-
-    send_text = f"""
-<b>Пробник</b>
-<b>Пользователь:</b> @{call.from_user.username}
-<b>ЖК:</b> <i>{data["rc"]}</i>
-<b>Дата получения:</b> <code>{call.data}</code>
-
-<b>Контактные данные:</b>
-<i>{contact_data}</i>"""
-    
-    await bot.send_message(chat_id=SEND_ORDER_CHAT_ID, text = send_text)
 
     
-    change_get_sample(user_id=call.from_user.id)
+    
     
 
 
@@ -176,77 +164,14 @@ async def input_contact_data(message : Message, state : FSMContext):
     
     await bot.send_message(chat_id=SEND_ORDER_CHAT_ID, text = send_text)
 
-    edit_contact_data(user_id=message.from_user.id, contact_data=message.text)
     change_get_sample(user_id=message.from_user.id)
 
 
 
-
-
-
-@router.callback_query(F.data == "make_order", UserStates.MAIN_MENU)
-async def make_order(call : CallbackQuery, state : FSMContext):
-    contact_data = get_contact_data(call.from_user.id)
-    if not contact_data:
-        send_text = """Пожалуйста, напишите ваше имя и номер телефона для связи: 
-Эта информация нужна, чтобы мы могли уточнить детали доставки.😊"""
-        try:
-            await call.message.edit_text(text = send_text)
-            await state.set_state(UserStates.INPUT_CONTACT_DATA_ORDER)
-
-        except TelegramBadRequest:
-            await call.message.answer(text = send_text)
-            await state.set_state(UserStates.INPUT_CONTACT_DATA_ORDER)
-        
-        except Exception as ex:
-            logger.error(f"Error in make_order handler: {str(ex)}")
-            await call.answer(text = "Произошла ошибка, попробуйте позже.")
-
-        
-
-        return
-    
-    send_text = "Спасибо ваша заявка принята."
-    await call.message.reply(send_text)
-
-    send_text = f"""
-<b>Заказ</b>
-<b>Пользователь:</b> @{call.from_user.username}
-
-<b>Контактные данные:</b>
-<i>{contact_data}</i>"""
-    
-    await bot.send_message(chat_id=SEND_ORDER_CHAT_ID, text = send_text)
     
 
 
-@router.message(F.text, UserStates.INPUT_CONTACT_DATA_ORDER)
-async def input_contact_data_order(message : Message, state : FSMContext):
-    contact_data = message.text
-    if len(contact_data) > 1024:
-        return await message.reply("Слишком длинное сообщение")
-    
-    send_text = "Спасибо ваша заявка принята."
-    await message.answer(send_text)
-    message_content = await get_welcome_message()
-    send_video = message_content["video"]
-    send_text = message_content["text"]
-    main_menu_kb = message_content["keyboard"]
-    
-    await message.answer_video(caption=send_text, video=send_video, reply_markup=main_menu_kb)
-    #await message.answer(send_text, reply_markup=main_menu_kb)
 
-
-    edit_contact_data(message.from_user.id, contact_data)
-
-    send_text = f"""
-<b>Заказ</b>
-<b>Пользователь:</b> @{message.from_user.username}
-
-<b>Контактные данные:</b>
-<i>{contact_data}</i>"""
-    
-    await bot.send_message(chat_id=SEND_ORDER_CHAT_ID, text = send_text)
 
 
 

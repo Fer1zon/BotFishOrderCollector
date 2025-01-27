@@ -10,9 +10,11 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 from pathlib import Path
 
-
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from datetime import datetime
+
+from importantFiles.database.models import Model
 
 
 load_dotenv()
@@ -30,6 +32,20 @@ logging.basicConfig(
 
 logging.info("--------------------------START--------------------------")
 logger = logging.getLogger(__name__)
+
+
+
+
+data_base_path = str(Path("importantFiles","database","data_base.db"))
+
+dbEngine = create_async_engine(
+    "sqlite+aiosqlite:///" + data_base_path
+)
+new_session = async_sessionmaker(dbEngine, expire_on_commit=False)
+
+async def createTables():
+    async with dbEngine.begin() as conn:
+        await conn.run_sync(Model.metadata.create_all)
 
 
 
